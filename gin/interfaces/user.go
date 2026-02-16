@@ -1,6 +1,6 @@
 package interfaces
 
 type UserModelInterface interface {
-    GetUserId() int
-    GetDeviceToken() string
+	GetUserId() int
+	GetDeviceToken() string
 }

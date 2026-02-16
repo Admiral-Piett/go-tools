@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code v6.0.1
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go v6.1.0
+        uses: actions/setup-go@4dc6199c7b1a012772edbd06daecab0f50c9053c
+        with:
+          go-version: '1.24'
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Read version from .version file
+        id: get_version
+        run: |
+          VERSION=$(cat .version | xargs)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Creating release for version: $VERSION"
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git rev-parse "${{ steps.get_version.outputs.version }}" >/dev/null 2>&1; then
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.get_version.outputs.version }} already exists, skipping release"
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+            echo "Tag ${{ steps.get_version.outputs.version }} does not exist, proceeding with release"
+          fi
+
+      - name: Create and push tag
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag ${{ steps.get_version.outputs.version }}
+          git push origin ${{ steps.get_version.outputs.version }}
+
+      - name: Create GitHub Release v1.1.4
+        if: steps.check_tag.outputs.tag_exists == 'false'
+        uses: actions/create-release@0cb9c9b65d5d1901c1f53e5e66eaf4afd303e70e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.version }}
+          release_name: Release ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          body: |
+            Automatic release for go-tools
+            
+            ## Changes
+            See commit history for details
+            
+            ## Usage
+            Add this to your go.mod:
+            ```go
+            require github.com/Admiral-Piett/go-tools ${{ steps.get_version.outputs.version }}
+            ```
+          
+            Or run:
+            ```bash
+            go get github.com/Admiral-Piett/go-tools@${{ steps.get_version.outputs.version }}
+            ```
