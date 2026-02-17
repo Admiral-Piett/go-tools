@@ -47,6 +47,9 @@ type BaseSettings struct {
 	LogLevel    string `env:"LOG_LEVEL" default:"INFO"`
 	SqlLogLevel string `env:"SQL_LOG_LEVEL" default:"WARNING"`
 
+	SqlType string `env:"SQL_TYPE" default:"sqlite"`
+	SqlUri  string `env:"SQL_URI" default:"path/to/sqlite.db"`
+
 	// Versioning
 	AppVersion string `env:"VERSION" default:"local.0"`
 	GitSha     string `env:"GIT_SHA" default:"local"`
