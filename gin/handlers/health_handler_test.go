@@ -13,6 +13,7 @@ import (
 func TestHealthCheck_Success(t *testing.T) {
 	os.Setenv("VERSION", "local.0")
 	os.Setenv("GIT_SHA", "git-sha")
+	os.Setenv("APP_NAME", "app-name")
 	defer func() {
 		os.Unsetenv("VERSION")
 		os.Unsetenv("GIT_SHA")
@@ -27,7 +28,7 @@ func TestHealthCheck_Success(t *testing.T) {
 	assert.Nil(t, err)
 
 	assert.Equal(t, "healthy", response.Status)
-	assert.Equal(t, "polytracker-backend", response.Service)
+	assert.Equal(t, "app-name", response.Service)
 	assert.Equal(t, "local.0", response.Version)
 	assert.Equal(t, "git-sha", response.GitSha)
 }

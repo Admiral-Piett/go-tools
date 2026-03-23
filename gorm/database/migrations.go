@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"github.com/Admiral-Piett/go-tools/gorm/interfaces"
 	"sort"
 	"time"
 
@@ -41,7 +42,7 @@ func RegisterMigration(migration Migration) {
 }
 
 // RunMigrations executes all pending migrations
-func RunMigrations(db *Database) (err error) {
+func RunMigrations(db interfaces.DatabaseInterface) (err error) {
 	// Create migrations table if it doesn't exist
 	if err := db.AutoMigrate(&MigrationRecord{}); err != nil {
 		return fmt.Errorf("failed to create migrations table: %w", err)
@@ -130,7 +131,7 @@ func RunMigrations(db *Database) (err error) {
 }
 
 // rollbackMigrations rolls back a list of migrations that have already been preformed today in reverse order
-func rollbackMigrations(db *Database, appliedMigrations []string) error {
+func rollbackMigrations(db interfaces.DatabaseInterface, appliedMigrations []string) error {
 	log.WithField(MIGRATION_IDS_TO_ROLLBACK, len(appliedMigrations)).
 		Warn("Rolling back migrations")
 
