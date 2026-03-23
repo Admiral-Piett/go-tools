@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"github.com/Admiral-Piett/go-tools/gorm/interfaces"
 	"github.com/Admiral-Piett/go-tools/settings"
-	"gorm.io/driver/sqlite"
 	"strings"
 
+	"github.com/glebarez/sqlite"
 	log "github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -41,11 +41,11 @@ func NewDatabase(cfg *settings.BaseSettings) (interfaces.DatabaseInterface, erro
 	var db *gorm.DB
 	var err error
 	if strings.ToLower(cfg.SqlType) == "postgres" {
-		db, err = gorm.Open(sqlite.Open(cfg.SqlUri), &gorm.Config{
+		db, err = gorm.Open(postgres.Open(cfg.SqlUri), &gorm.Config{
 			Logger: gormLogger,
 		})
 	} else {
-		db, err = gorm.Open(postgres.Open(cfg.SqlUri), &gorm.Config{
+		db, err = gorm.Open(sqlite.Open(cfg.SqlUri), &gorm.Config{
 			Logger: gormLogger,
 		})
 	}
@@ -66,8 +66,6 @@ func (d *Database) Close() error {
 	return sqlDB.Close()
 }
 
-// NOTE: honestly, I don't know if these are worth it...we could go with sqlmock the whole way.
-// Close closes the database connection
 func (d *Database) DB() *gorm.DB {
 	return d.db
 }

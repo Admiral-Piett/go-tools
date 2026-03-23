@@ -27,7 +27,7 @@ func HealthCheck(c *gin.Context) {
 
 	response := HealthCheckResponse{
 		Status:    "healthy",
-		Service:   "polytracker-backend",
+		Service:   os.Getenv("APP_NAME"),
 		Version:   os.Getenv("VERSION"),
 		GitSha:    os.Getenv("GIT_SHA"),
 		Timestamp: time.Now().UTC(),
